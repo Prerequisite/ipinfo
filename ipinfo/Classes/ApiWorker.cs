@@ -13,33 +13,42 @@ namespace Ipinfo.Classes
 {
     class ApiWorker
     {
-        public async Task<bool> SendRequest(string ipAddress)
+        public async Task<ApiResponse> SendRequest(string ipAddress)
         {
-            var apiUrl = "http://ipinfo.io/";
-            var RequestUrl = String.Format("http://ipinfo.io/{0}/{1}", ipAddress, "json");
+            const string apiUrl = "http://ipinfo.io/";
+            var requestUrl = String.Format("http://ipinfo.io/{0}/{1}", ipAddress, "json");
+
+            var httpClient = new HttpClient()
+            {
+                BaseAddress = new Uri(apiUrl)
+            };
+
+            try
+            {
+                HttpResponseMessage responseMessage = await httpClient.GetAsync(requestUrl);
+                var content = await responseMessage.Content.ReadAsStringAsync();
+                ApiResponse response = JsonConvert.DeserializeObject<ApiResponse>(content);
 
 
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(apiUrl);
+                Console.WriteLine("\r\n" + "Results" + "\r\n");
+                Console.WriteLine("    IP . . . .  : " + response.IP);
+                Console.WriteLine("    Hostname  . : " + (response.Hostname ?? "Unknown"));
+                Console.WriteLine("    Country . . : " + (response.Country ?? "Unknown"));
+                Console.WriteLine("    City  . . . : " + (response.City ?? "Unknown"));
+                Console.WriteLine("    Postcode  . : " + (response.Postal ?? "Unknown"));
+                Console.WriteLine("    Lat - Long  : " + (response.Loc ?? "Unknown"));
+                Console.WriteLine("    Organisation: " + (response.Org ?? "Unknown"));
 
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
 
-            HttpResponseMessage responseMessage = new HttpResponseMessage();
-            responseMessage = await client.GetAsync(RequestUrl);
-
-            string content = await responseMessage.Content.ReadAsStringAsync();
-            ApiResponse response = JsonConvert.DeserializeObject<ApiResponse>(content);
-
-            Console.WriteLine("\r\n" + "Results" + "\r\n");
-            Console.WriteLine("    IP......... : " + response.IP);
-            Console.WriteLine("    Hostname... : " + response.Hostname);
-            Console.WriteLine("    Country.... : " + response.Country);
-            Console.WriteLine("    City....... : " + response.City);
-            Console.WriteLine("    Postcode... : " + response.Postal);
-            Console.WriteLine("    Lat - Long. : " + response.Loc);
-            Console.WriteLine("    Organisation: " + response.Org);
-            Console.WriteLine("\r\n");
-
-            return true;
+                return null;
+            }
         }
     }
 }

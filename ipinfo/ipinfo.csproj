@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\ApiWorker.cs" />
+    <Compile Include="Classes\Extensions.cs" />
     <Compile Include="Classes\Options.cs" />
     <Compile Include="Classes\ApiResponse.cs" />
     <Compile Include="Program.cs" />

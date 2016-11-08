@@ -3,6 +3,7 @@ using CommandLine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,17 +16,18 @@ namespace Ipinfo
             var options = new Options();
             var isValid = Parser.Default.ParseArguments(args, options);
 
-            if (isValid)
+            if (isValid && args[1].IsIPv4())
             {
-                Request(args[1]);
+                var apiWorker = new ApiWorker();
+                apiWorker.SendRequest(args[1]).Wait();
             }
-            Console.ReadLine();
-        }
+            else
+            {   
+                Console.WriteLine("\r\n" + "Invalid arguments passed");
+                Console.WriteLine("\r\n" + "Examples:" + "\r\n");
+                Console.WriteLine("    > ipinfo -i 8.8.8.8  ... Geolocate an IP Address");
+            }
 
-        public static async void Request(string ipAddress)
-        {
-            ApiWorker apiw = new ApiWorker();
-            await apiw.SendRequest(ipAddress);
         }
     }
 }

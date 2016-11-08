@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ipinfo.Classes
 {
+    
     class ApiResponse
     {
         public string IP { get; set; }
